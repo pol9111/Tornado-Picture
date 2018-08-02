@@ -1,0 +1,6 @@
+redis
+pymysql
+tornado
+sqlalchemy
+pycket
+pillow

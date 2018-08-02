@@ -2,5 +2,7 @@
 
 {% block title %}explore page{% end %}
 {% block content %}
-explore content
+  {% for im in images %}
+    <img src="{{ im }}" width="" height="200px">
+  {% end %}
 {% end %}
