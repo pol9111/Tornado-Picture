@@ -3,5 +3,33 @@
 {% block title %}index page{% end %}
 
 {% block content %}
-
+<div>
+  {% if msg %}
+  <p>{{ msg }}</p>
+  {% end %}
+</div>
+<div>
+  <form action="/signup" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+      Username
+      <input autofocus="" type="text" name="username" id="id_username" maxlength="150" required="">
+    </div>
+    <div class="form-group">
+      Email
+      <input type="email" name="email" id="id_email" required="">
+    </div>
+    <div class="form-group">
+       Password
+       <input type="password" name="password1" id="id_password1" required="">
+    </div>
+    <div class="form-group">
+       Password confirmation
+       <input type="password" name="password2" id="id_password2" required="">
+    </div>
+    <button class="btn btn-default">注册</button>
+    <div class="text-center help-text">
+      已有账号请<a href="/login">登入</a>
+    </div>
+  </form>
+</div>
 {% end %}

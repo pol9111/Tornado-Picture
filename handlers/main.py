@@ -1,6 +1,7 @@
 import os
 import tornado.web
 from utils import photo
+from utils.account import add_post_for, get_post_for
 from pycket.session import SessionMixin
 
 
@@ -17,29 +18,30 @@ class IndexHandler(AuthBaseHandler):
     """
     @tornado.web.authenticated # tornado自动验证登入
     def get(self, *args, **kwargs):
-        # 从settings拿到iamges的路径
-        images_path = os.path.join(self.settings.get('static_path'), 'uploads')
-        # 调用get_images拿到拿到图片
-        images = photo.get_images(images_path)
-        # 传入模板
-        self.render('index.html', images=images)
+        posts = get_post_for(self.current_user)
+        image_urls = [p.image_url for p in posts] # p.image_url即posts.image_url
+        print(image_urls)
+        print(image_urls)
+        print(image_urls)
+        self.render('index.html', images=image_urls)
 
-class ExploreHandler(tornado.web.RequestHandler):
+class ExploreHandler(AuthBaseHandler):
     """
     Explore page, photo of other users.
     """
     def get(self, *args, **kwargs):
-        img_urls = photo.get_images('./static/uploads/thumbs')
-        self.render('explore.html', images=img_urls)
+        posts = get_post_for(self.current_user)
+        thumb_urls = [p.thumb_url for p in posts]
+        self.render('index.html', images=thumb_urls)
 
 class PostHandler(tornado.web.RequestHandler):
     """
     Single photo page, and maybe comments.
     """
-    def get(self, *args, **kwargs):
-        self.render('post.html', post_id=kwargs['post_id'])
+    def get(self, post_id):
+        self.render('post.html', post_id=post_id)
 
-class UploadHandler(tornado.web.RequestHandler):
+class UploadHandler(AuthBaseHandler):
     """
     Accept images upload.
     """
@@ -51,8 +53,16 @@ class UploadHandler(tornado.web.RequestHandler):
         global img_file
         img_files = self.request.files.get('newimg', None)
         for img_file in img_files:
-            with open('./static/uploads/' + img_file['filename'], 'wb') as f:
+            base_name = 'uploads/' + img_file['filename'] # 图片路径
+            save_to = os.path.join(self.settings['static_path'], base_name) # 完整图片路径
+            print("save to {}".format(save_to))
+            with open(save_to, 'wb') as f:
                 f.write(img_file['body'])
-            photo.make_thumb('./static/uploads/'+img_file['filename'])
+            full_path = photo.make_thumb(save_to) # 保存缩略图
+            thumb_url = os.path.relpath(full_path, self.settings['static_path'])
+            # 要拿到current_user此类必须继承 AuthBaseHandler即用户系统类
+            add_post_for(self.current_user, base_name, thumb_url) # 把上传的图片路径保存到数据库
+
         self.write({'got file': img_file['filename']})
+        self.redirect('/explore')
 

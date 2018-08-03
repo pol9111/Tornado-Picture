@@ -15,8 +15,8 @@ class Application(tornado.web.Application):
             ('/post/(?P<post_id>[0-9]+)', main.PostHandler),
             ('/upload', main.UploadHandler), # 上传图片界面
             ('/login', auth.LoginHandler), # 用户登入界面
-            ('/logout', auth.LoginHandler), # 用户登出界面
-            ('/signup', auth.LoginHandler), # 用户登出界面
+            ('/logout', auth.LogoutHandler), # 用户登出界面
+            ('/signup', auth.SignupHandler), # 用户注册界面
         ]
         settings = dict(
             debug=True,

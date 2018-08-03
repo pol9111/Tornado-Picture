@@ -4,3 +4,4 @@ tornado
 sqlalchemy
 pycket
 pillow
+alembic

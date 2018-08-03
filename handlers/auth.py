@@ -1,5 +1,5 @@
 import tornado.web
-from utils.account import authenticate
+from utils.account import authenticate, register, login
 from .main import AuthBaseHandler
 
 class LoginHandler(AuthBaseHandler):
@@ -17,6 +17,7 @@ class LoginHandler(AuthBaseHandler):
 
         if passed:
             self.session.set('user_info', username)
+            login(username)
             self.redirect('/')
         else:
             self.write({'msg': 'login fail'})
@@ -31,10 +32,13 @@ class LogoutHandler(AuthBaseHandler):
 
 
 class SignupHandler(AuthBaseHandler):
+    """
+    用户注册处理
+    """
     def get(self, *args, **kwargs):
-        self.render('signup.html')
+        self.render('signup.html', msg='')
 
-    def psot(self):
+    def post(self):
         username = self.get_argument('username', '')
         email = self.get_argument('email', '')
         password1 = self.get_argument('password1', '')
@@ -44,5 +48,13 @@ class SignupHandler(AuthBaseHandler):
             if password1 != password2:
                 self.write({'msg': '两次输入的密码不匹配'})
             else:
-                pass
+                ret = register(username, password1, email)
+                if ret['msg'] == 'ok':
+                    self.session.set('user_info', username)
+                    self.redirect('/')
+                else:
+                    self.write(ret)
+        else:
+            self.render('signup.html', msg={'register fail'})
+
 
