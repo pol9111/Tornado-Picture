@@ -20,9 +20,6 @@ class IndexHandler(AuthBaseHandler):
     def get(self, *args, **kwargs):
         posts = get_post_for(self.current_user)
         image_urls = [p.image_url for p in posts] # p.image_url即posts.image_url
-        print(image_urls)
-        print(image_urls)
-        print(image_urls)
         self.render('index.html', images=image_urls)
 
 class ExploreHandler(AuthBaseHandler):
@@ -50,19 +47,14 @@ class UploadHandler(AuthBaseHandler):
 
     def post(self, *args, **kwargs):
         # 保存上传的图片, 并压缩, 压缩图也保存
-        global img_file
         img_files = self.request.files.get('newimg', None)
-        for img_file in img_files:
-            base_name = 'uploads/' + img_file['filename'] # 图片路径
-            save_to = os.path.join(self.settings['static_path'], base_name) # 完整图片路径
-            print("save to {}".format(save_to))
-            with open(save_to, 'wb') as f:
-                f.write(img_file['body'])
-            full_path = photo.make_thumb(save_to) # 保存缩略图
-            thumb_url = os.path.relpath(full_path, self.settings['static_path'])
-            # 要拿到current_user此类必须继承 AuthBaseHandler即用户系统类
-            add_post_for(self.current_user, base_name, thumb_url) # 把上传的图片路径保存到数据库
+        for img in img_files:
+            saver = photo.ImageSave(self.settings['static_path'], img['filename'])
+            saver.save_upload(img['body'])
+            saver.make_thumb()
+            add_post_for(self.current_user, saver.upload_url, saver.thumb_url) # 把上传的图片路径保存到数据库
+            print("save to {}".format(saver.upload_path))
 
-        self.write({'got file': img_file['filename']})
+        self.write({'got file': img_files[0]['filename']})
         self.redirect('/explore')
 
