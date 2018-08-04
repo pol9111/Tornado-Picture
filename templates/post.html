@@ -2,5 +2,10 @@
 
 {% block title %}post page{% end %}
 {% block content %}
-post of {{ post_id }} content
+  <div class="row justify-content-center">
+    <div class="col-12 col-sm-10">
+      <img src="{{ static_url(post.image_url) }}" width="900px" alt="">
+      <h4>{{ post.user.name }}</h4>
+    </div>
+  </div>
 {% end %}

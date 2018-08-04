@@ -1,4 +1,7 @@
 import glob
+import json
+import uuid
+
 import os
 from PIL import Image
 
@@ -20,19 +23,26 @@ class ImageSave(object):
     thumb_dir = 'thumbs'
     size = (200, 200)
 
-    def __init__(self, static_path, name):
+    def __init__(self, static_path, old_name):
         """
 
         :param static_path: 图片保存到服务器文件的路径
-        :param name: 用户上传的图片名字
+        :param old_name: 用户上传的图片名字
         """
         self.static_path = static_path
-        self.name = name
+        self.old_name = old_name
+        self.new_name = self.gen_name
+
+    @property
+    def gen_name(self):
+        """生成随机的唯一字符串的图片名"""
+        _, ext = os.path.splitext(self.old_name)
+        return uuid.uuid4().hex + ext
 
     @property
     def upload_url(self):
         """图片的相对路径"""
-        return os.path.join(self.upload_dir, self.name)
+        return os.path.join(self.upload_dir, self.new_name)
     # /uploads/539179818c964c925055207aa3be5df5.jpg
 
     @property
@@ -50,7 +60,7 @@ class ImageSave(object):
     @property
     def thumb_url(self):
         """缩略图的相对路径"""
-        base, _ = os.path.splitext(self.name)
+        base, _ = os.path.splitext(self.new_name)
         thumb_name = os.path.join('{0}_{1}x{2}.jpg'.format(base, self.size[0], self.size[1]))
         return os.path.join(self.upload_dir, self.thumb_dir, thumb_name)
     # uploads/thumbs/539179818c964c925055207aa3be5df5_200x200.jpg
@@ -60,6 +70,8 @@ class ImageSave(object):
         im = Image.open(self.upload_path)
         im.thumbnail(self.size)
         im.save(os.path.join(self.static_path, self.thumb_url), 'JPEG')
+
+
 
 
 

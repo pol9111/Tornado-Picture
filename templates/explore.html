@@ -2,7 +2,12 @@
 
 {% block title %}explore page{% end %}
 {% block content %}
-  {% for im in images %}
-    <img src="{{ static_url(im) }}" width="" height="200px">
+  {% for p in posts %}
+    <figure class="figure">
+      <a href="/post/{{ p.id }}">
+        <img src="{{ static_url(p.thumb_url) }}" class="figure-img img-fluid rounded" height="300px">
+      </a>
+      <figcaption class="figure-caption">upload by {{ p.user.name }}</figcaption>
+    </figure>
   {% end %}
 {% end %}

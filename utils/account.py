@@ -56,3 +56,13 @@ def get_post_for(username):
     posts = session.query(Post).filter_by(user=user)
     return posts
 
+def get_post(post_id):
+    """
+    获取指定id的post
+    """
+    post = session.query(Post).get(post_id)
+    return post
+
+def get_all_posts():
+    posts = session.query(Post).order_by(Post.id.desc()).limit(5)
+    return posts

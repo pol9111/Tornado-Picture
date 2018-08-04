@@ -3,8 +3,8 @@
 {% block title %}login page{% end %}
 
 {% block content %}
-<div>
-  <div class="">
+<div class="row justify-content-center">
+  <div class="col-sm-6">
     <form action="/login" method="post"
           enctype="multipart/form-data">
       <div class="form-group">
@@ -17,7 +17,7 @@
         <input class="form-control" id="id_password"
         name="password" type="password" required="">
       </div>
-      <button class="">Login</button>
+      <button class="btn btn-primary">Login</button>
       <div>
         还没有账号, 需要<a href="/signup">注册</a>一个
       </div>

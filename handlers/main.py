@@ -1,7 +1,7 @@
 import os
 import tornado.web
 from utils import photo
-from utils.account import add_post_for, get_post_for
+from utils.account import add_post_for, get_post_for, get_post, get_all_posts
 from pycket.session import SessionMixin
 
 
@@ -19,24 +19,26 @@ class IndexHandler(AuthBaseHandler):
     @tornado.web.authenticated # tornado自动验证登入
     def get(self, *args, **kwargs):
         posts = get_post_for(self.current_user)
-        image_urls = [p.image_url for p in posts] # p.image_url即posts.image_url
-        self.render('index.html', images=image_urls)
+        # image_urls = [p.image_url for p in posts] # p.image_url即posts.image_url
+        self.render('index.html', posts=posts)
 
 class ExploreHandler(AuthBaseHandler):
     """
     Explore page, photo of other users.
     """
     def get(self, *args, **kwargs):
-        posts = get_post_for(self.current_user)
-        thumb_urls = [p.thumb_url for p in posts]
-        self.render('index.html', images=thumb_urls)
+        # posts = get_post_for(self.current_user)
+        # thumb_urls = [p.thumb_url for p in posts]
+        posts = get_all_posts()
+        self.render('explore.html', posts=posts)
 
 class PostHandler(tornado.web.RequestHandler):
     """
     Single photo page, and maybe comments.
     """
     def get(self, post_id):
-        self.render('post.html', post_id=post_id)
+        post = get_post(int(post_id))
+        self.render('post.html', post=post)
 
 class UploadHandler(AuthBaseHandler):
     """
@@ -56,5 +58,5 @@ class UploadHandler(AuthBaseHandler):
             print("save to {}".format(saver.upload_path))
 
         self.write({'got file': img_files[0]['filename']})
-        self.redirect('/explore')
+        self.redirect('/upload')
 
